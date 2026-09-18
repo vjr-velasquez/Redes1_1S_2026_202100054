@@ -27,6 +27,10 @@ La solución implementa:
 
 La topología utilizada corresponde a una **topología jerárquica en estrella extendida**, con enlaces redundantes en las áreas críticas.
 
+![Topología completa de SmartCity Tech Park](./img/topologia_completa.png)
+
+*Figura 1. Topología completa implementada en Cisco Packet Tracer.*
+
 ---
 
 ## 2. Parámetros derivados del carné
@@ -140,6 +144,10 @@ El segmento Legacy utiliza un **Hub**, lo cual crea un dominio de colisión comp
 | 54 | VISITANTES | Edificio Corporativo / Wi-Fi |
 | 94 | NATIVA | VLAN nativa de enlaces trunk |
 
+![VLANs configuradas en SW-CORE](./img/vlans_core.png)
+
+*Figura 2. VLANs creadas en el servidor VTP `SW-CORE`.*
+
 ---
 
 ## 6. VTP
@@ -172,19 +180,24 @@ El segmento Legacy utiliza un **Hub**, lo cual crea un dominio de colisión comp
 
 `SW-GUEST` se configuró como **VTP Transparent** para mantener aislada la administración de VLANs del segmento de visitantes.
 
-### 6.4 Evidencia recomendada
+### 6.4 Evidencia
 
-Insertar captura de:
+En `SW-CORE` se ejecutó:
 
 ```bash
 show vtp status
 ```
 
-En `SW-CORE` se verificó:
+Se verificó:
 
 - VTP Domain Name: `Smart_5`
 - VTP Operating Mode: `Server`
 - Configuration Revision: `13`
+- Number of existing VLANs: `11`
+
+![VTP Server y EtherChannel en SW-CORE](./img/vtp_etherchannel_core.png)
+
+*Figura 3. Estado VTP del servidor `SW-CORE`; en la misma evidencia se observan los Port-Channel LACP activos.*
 
 ---
 
@@ -216,6 +229,10 @@ En `SW-CORE` se validó:
 - `Po2` trunk, nativa 94
 - `Fa0/5` trunk, nativa 94
 - `Fa0/6` trunk, nativa 94
+
+![Enlaces troncales de SW-CORE](./img/trunks_core.png)
+
+*Figura 4. Enlaces troncales 802.1Q del Core con VLAN nativa 94 y VLANs permitidas 14,24,34,44,54,94.*
 
 ---
 
@@ -276,6 +293,10 @@ Resultado validado en `SW-CORE`:
 1  Po1(SU)  LACP  Fa0/1(P) Fa0/2(P)
 2  Po2(SU)  LACP  Fa0/3(P) Fa0/4(P)
 ```
+
+![EtherChannel LACP en SW-CORE](./img/vtp_etherchannel_core.png)
+
+*Figura 5. `Po1` y `Po2` activos mediante LACP; los puertos físicos aparecen agregados con estado `(P)`.*
 
 ### 8.4 Prueba de tolerancia a fallos
 
@@ -352,6 +373,30 @@ En las VLANs configuradas se verificó la línea:
 ```text
 This bridge is the root
 ```
+
+#### Evidencia Root Bridge VLAN 24 – Investigación
+
+![Root Bridge VLAN 24](./img/stp_vlan24_id.png)
+
+*Figura 6. `SW-ID-DIST` como Root Bridge de la VLAN 24.*
+
+#### Evidencia Root Bridge VLAN 34 – Producción
+
+![Root Bridge VLAN 34](./img/stp_vlan34_produccion.png)
+
+*Figura 7. `SW-PROD-DIST` como Root Bridge de la VLAN 34.*
+
+#### Evidencia Root Bridge VLAN 14 – Gerencia
+
+![Root Bridge VLAN 14](./img/stp_vlan14_corporativo.png)
+
+*Figura 8. `SW-CORP-DIST` como Root Bridge de la VLAN 14.*
+
+#### Evidencia Root Bridge VLAN 44 – Servidores
+
+![Root Bridge VLAN 44](./img/stp_vlan44_core.png)
+
+*Figura 9. `SW-CORE` como Root Bridge de la VLAN 44.*
 
 ---
 
@@ -636,6 +681,10 @@ Resultado:
 Sent = 4, Received = 4, Lost = 0 (0% loss)
 ```
 
+![Prueba de conectividad I+D y aislamiento](./img/ping_id_aislamiento.png)
+
+*Figura 10. Prueba exitosa dentro de la VLAN 24. En la misma captura se observa una prueba fallida hacia la VLAN 14, demostrando aislamiento inter-VLAN.*
+
 ### 16.2 Gerencia
 
 Prueba:
@@ -663,6 +712,10 @@ Resultado:
 ```text
 Sent = 4, Received = 4, Lost = 0 (0% loss)
 ```
+
+![Prueba Producción y aislamiento](./img/ping_produccion_aislamiento.png)
+
+*Figura 11. Comunicación exitosa dentro de la VLAN 34 a través del segmento Legacy; la misma captura muestra aislamiento frente a la VLAN 44.*
 
 ### 16.4 Servidores
 
@@ -857,72 +910,24 @@ show spanning-tree vlan <ID>
 
 ---
 
-## 20. Evidencias a insertar
+## 20. Evidencias gráficas incluidas
 
-Agregar capturas en esta sección antes de la entrega final.
+Las evidencias principales ya fueron integradas en las secciones correspondientes del documento. Los archivos se encuentran en la carpeta `img/`.
 
-### 20.1 Topología completa
+| Evidencia | Archivo |
+|---|---|
+| Topología completa | `img/topologia_completa.png` |
+| VTP Server + EtherChannel | `img/vtp_etherchannel_core.png` |
+| VLANs en SW-CORE | `img/vlans_core.png` |
+| Trunks y VLAN nativa 94 | `img/trunks_core.png` |
+| STP VLAN 24 | `img/stp_vlan24_id.png` |
+| STP VLAN 34 | `img/stp_vlan34_produccion.png` |
+| STP VLAN 14 | `img/stp_vlan14_corporativo.png` |
+| STP VLAN 44 | `img/stp_vlan44_core.png` |
+| Ping I+D + aislamiento | `img/ping_id_aislamiento.png` |
+| Ping Producción + aislamiento | `img/ping_produccion_aislamiento.png` |
 
-```markdown
-![Topología completa](./img/topologia_completa.png)
-```
-
-### 20.2 Centro de Datos
-
-```markdown
-![Centro de Datos](./img/centro_datos.png)
-```
-
-### 20.3 I+D
-
-```markdown
-![Centro I+D](./img/id.png)
-```
-
-### 20.4 Corporativo
-
-```markdown
-![Corporativo](./img/corporativo.png)
-```
-
-### 20.5 Producción
-
-```markdown
-![Producción](./img/produccion.png)
-```
-
-### 20.6 VTP
-
-```markdown
-![VTP Server](./img/vtp_server.png)
-```
-
-### 20.7 EtherChannel
-
-```markdown
-![EtherChannel](./img/etherchannel.png)
-```
-
-### 20.8 Spanning Tree
-
-```markdown
-![Spanning Tree](./img/spanning_tree.png)
-```
-
-### 20.9 Trunks
-
-```markdown
-![Trunks](./img/trunks.png)
-```
-
-### 20.10 Pruebas de ping
-
-```markdown
-![Ping I+D](./img/ping_id.png)
-![Ping Gerencia](./img/ping_gerencia.png)
-![Ping Producción](./img/ping_produccion.png)
-![Ping Servidores](./img/ping_servidores.png)
-```
+> La prueba de tolerancia a fallos de EtherChannel se documenta mediante la salida `Po1(SU) LACP Fa0/1(D) Fa0/2(P)` descrita en la sección 8.4. Si se obtiene una captura adicional de ese estado, puede agregarse como `img/etherchannel_falla.png`.
 
 ---
 
@@ -968,18 +973,15 @@ Redes1_1S_2026_202100054/
     ├── README.md
     └── img/
         ├── topologia_completa.png
-        ├── centro_datos.png
-        ├── id.png
-        ├── corporativo.png
-        ├── produccion.png
-        ├── vtp_server.png
-        ├── etherchannel.png
-        ├── spanning_tree.png
-        ├── trunks.png
-        ├── ping_id.png
-        ├── ping_gerencia.png
-        ├── ping_produccion.png
-        └── ping_servidores.png
+        ├── vtp_etherchannel_core.png
+        ├── vlans_core.png
+        ├── trunks_core.png
+        ├── stp_vlan24_id.png
+        ├── stp_vlan34_produccion.png
+        ├── stp_vlan14_corporativo.png
+        ├── stp_vlan44_core.png
+        ├── ping_id_aislamiento.png
+        └── ping_produccion_aislamiento.png
 ```
 
 ---
